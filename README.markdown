@@ -39,3 +39,8 @@ Copyright and license
 Copyright 2016 Anil Shanbhag
 
 Distributed under GPL v2
+
+2023.10.17 fork
+需要：基于当前项目进行远程的视频通话
+由于设备过少无法进行双端测试，今日目标为通过让服务器获取到client所上传的视频流信息
+
