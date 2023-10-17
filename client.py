@@ -19,18 +19,16 @@ class Client:
     def connect(self):
         self.videofeed = VideoFeed("client",1)
         # self.videofeed = VideoFeed("client",'D:\\learn\\videochat\\videochat_self\\videochat\\1.mp4')
-        frame=self.videofeed.get_frame()
         # 持续从视频流中获取帧信息
         while True:
             # 通过videofeed来获取本机的视频流数据
+            frame=self.videofeed.get_frame()
             if frame :
                 self.vsock.vsend(frame) 
                 print(type(frame))
             else:
                 print("frame获取失败")
                 continue 
-            # 
-            
 
             # 从服务器接受返回数据，受设备限制，暂不启用
             # frame = self.vsock.vreceive()
