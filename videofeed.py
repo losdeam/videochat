@@ -3,6 +3,8 @@ import numpy
 import io
 from PIL import Image
 
+import function
+
 class VideoFeed:
 
     def __init__(self,name="w1",capture=1):
@@ -15,18 +17,11 @@ class VideoFeed:
             self.cam = cv2.VideoCapture(self.camera_index)
         else :
             self.cam = cv2.VideoCapture(capture)
+
     def get_frame(self):
         ret_val, img = self.cam.read()
-        # c = cv2.waitKey(1)
-        # if (c == "n"): #in "n" key is pressed while the popup window is in focus
-        #     self.camera_index += 1 #try the next camera index
-        #     self.cam = cv2.VideoCapture(self.camera_index)
-        #     if not self.cam: #if the next camera index didn't work, reset to 0.
-        #         self.camera_index = 0
-        #         self.cam = cv2.VideoCapture(self.camera_index)
-
         if ret_val :
-            
+            img = function.resize(img)
             cv2_im = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
             pil_im = Image.fromarray(cv2_im)
             #创建一个转换为byte类型的方法
@@ -38,7 +33,7 @@ class VideoFeed:
             return im_bytes
         return None
 
-    def set_frame(self, frame_bytes):
+    def  set_frame(self, frame_bytes):
         pil_bytes = io.BytesIO(frame_bytes)
         pil_image = Image.open(pil_bytes)
         cv_image = cv2.cvtColor(numpy.array(pil_image), cv2.COLOR_RGB2BGR)

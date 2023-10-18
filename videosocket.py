@@ -46,20 +46,23 @@ class videosocket:
     def vreceive(self):
         totrec=0
         metarec=0
-        msgArray = []
+        msgArray = b''
         metaArray = []
         n = 0 
         count = 10
         while metarec < 8:
             #从嵌套字中接受数据，最大获取量为8 - metarec
-            
             chunk = self.sock.recv(8 - metarec)
-            
+            #当chunk == b''，即无接收值时表示接收失败
             if chunk == b'':
                 n  += 1 
                 print("数据接受失败,失败次数为",n )
                 if n == count :
                     return None
+                continue 
+            if n != 0 :
+                n =0 
+                print("重连成功")
 
             
             metaArray.append(chunk.decode("utf-8"))
@@ -71,12 +74,11 @@ class videosocket:
 
         while totrec<length :
             chunk = self.sock.recv(length - totrec)
-            if chunk == '':
+            if chunk == b'':
                 raise RuntimeError("Socket connection broken")
-            msgArray.append(chunk)
+            msgArray+=chunk
             totrec += len(chunk)
-
-        return msgArray[0]
+        return msgArray
    
 
 

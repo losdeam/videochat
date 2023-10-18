@@ -16,18 +16,24 @@ class Client:
         self.data = StringIO()
 
     # 连接
-    def connect(self):
+    def connect(self,video):
         # self.videofeed = VideoFeed("client",1)
-        self.videofeed = VideoFeed("client",'D:\\learn\\videochat\\videochat_self\\videochat\\1.mp4')
+        self.videofeed = VideoFeed("client",video)
+        n = 0
         # 持续从视频流中获取帧信息
         while True:
             # 通过videofeed来获取本机的视频流数据
             frame=self.videofeed.get_frame()
             if frame :
                 self.vsock.vsend(frame) 
-                print(type(frame))
+                n=0
+                # print(type(frame))
             else:
                 print("frame获取失败")
+                n+=1 
+                if n == 10 :
+                    print("frame获取失败次数过多，已中断连接")
+                    break
                 continue 
 
             # 从服务器接受返回数据，受设备限制，暂不启用
@@ -38,6 +44,7 @@ class Client:
             # msg = self.vsock.vreceive()
             # print(msg)
 
+
 if __name__ == "__main__":
     #
     ip_addr = "127.0.0.1"
@@ -45,5 +52,6 @@ if __name__ == "__main__":
         ip_addr = sys.argv[1]
 
     print ("Connecting to " + ip_addr + "....")
+    video = 'D:\\learn\\videochat\\videochat_self\\videochat\\1.mp4'
     client = Client(ip_addr)
-    client.connect()
+    client.connect(video=video)
