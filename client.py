@@ -17,8 +17,8 @@ class Client:
 
     # 连接
     def connect(self):
-        self.videofeed = VideoFeed("client",1)
-        # self.videofeed = VideoFeed("client",'D:\\learn\\videochat\\videochat_self\\videochat\\1.mp4')
+        # self.videofeed = VideoFeed("client",1)
+        self.videofeed = VideoFeed("client",'D:\\learn\\videochat\\videochat_self\\videochat\\1.mp4')
         # 持续从视频流中获取帧信息
         while True:
             # 通过videofeed来获取本机的视频流数据

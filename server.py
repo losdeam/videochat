@@ -12,18 +12,27 @@ class Server:
         self.server_socket.listen(5)
         # 创建名为server的视频流
         self.videofeed = VideoFeed("server")
-        print ("TCPServer Waiting for client on port 6000")
+        
 
     def start(self):
+        print(1)
         while 1:
+            print ("TCPServer Waiting for client on port 6000")
             client_socket, address = self.server_socket.accept()
             print ("I got a connection from ", address)
-
             vsock = videosocket.videosocket(client_socket)
+            n = 0 
             while True:
+                # print(1)
                 frame=vsock.vreceive()
-                print("成功接受到数据,类型为", type(frame))
-                self.videofeed.set_frame(frame)
+                # print(2)
+                if frame :
+                    print("成功接受到数据,类型为", type(frame))
+                    self.videofeed.set_frame(frame)
+                else:
+                    print("客户端",address,"断开连接" )
+                    break 
+
                 # 获取视频数据，
                 # frame=self.videofeed.get_frame()
                 # 将视频数据方式发送给对应端口

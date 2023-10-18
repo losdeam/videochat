@@ -26,9 +26,9 @@ class VideoFeed:
         #         self.cam = cv2.VideoCapture(self.camera_index)
 
         if ret_val :
+            
             cv2_im = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
             pil_im = Image.fromarray(cv2_im)
-            
             #创建一个转换为byte类型的方法
             b = io.BytesIO()
             # 将 pil_im中内容以'jpg'的格式使用b所表示方法（转换为byte类型)进行保存

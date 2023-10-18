@@ -48,11 +48,20 @@ class videosocket:
         metarec=0
         msgArray = []
         metaArray = []
+        n = 0 
+        count = 10
         while metarec < 8:
             #从嵌套字中接受数据，最大获取量为8 - metarec
+            
             chunk = self.sock.recv(8 - metarec)
-            if chunk == '':
-                raise RuntimeError("Socket connection broken")
+            
+            if chunk == b'':
+                n  += 1 
+                print("数据接受失败,失败次数为",n )
+                if n == count :
+                    return None
+
+            
             metaArray.append(chunk.decode("utf-8"))
             metarec += len(chunk)
 
