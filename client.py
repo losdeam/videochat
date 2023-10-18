@@ -3,6 +3,7 @@ from io import StringIO
 from videofeed import VideoFeed
 import sys
 import os 
+# import pyaudio
 
 class Client:
     def __init__(self, ip_addr = "127.0.0.1"):
@@ -14,18 +15,23 @@ class Client:
         self.vsock = videosocket.videosocket (self.client_socket)
         self.videofeed = None
         self.data = StringIO()
-
+        
     # 连接
     def connect(self,video):
         # self.videofeed = VideoFeed("client",1)
         self.videofeed = VideoFeed("client",video)
+        # p = pyaudio.PyAudio()
+        # stream = p.open(format=pyaudio.paInt16, channels=1, rate=44100, input=True, frames_per_buffer=1024) 
+
         n = 0
         # 持续从视频流中获取帧信息
         while True:
             # 通过videofeed来获取本机的视频流数据
             frame=self.videofeed.get_frame()
+            # audio_data = stream.read(1024)  
             if frame :
                 self.vsock.vsend(frame) 
+                # self.vsock.vi
                 n=0
                 # print(type(frame))
             else:
@@ -47,7 +53,7 @@ class Client:
 
 if __name__ == "__main__":
     #
-    ip_addr = "127.0.0.1"
+    ip_addr = "192.168.56.1"
     if len(sys.argv) == 2:
         ip_addr = sys.argv[1]
 

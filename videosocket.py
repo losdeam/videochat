@@ -18,7 +18,7 @@ class videosocket:
         self.sock.connect((host,port))
 
     # 实现输出
-    def  vsend(self, framestring):
+    def  vsend(self, framestring,):
         '''
         发送framestring中的视频流，通过metasent来发送视频流当前帧的总长度，以便以接收端进行确认。通过totalsent来发送当前帧的数据。
         '''

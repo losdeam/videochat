@@ -1,7 +1,6 @@
 import cv2
-import numpy
-import io
-from PIL import Image
+
+import base64
 
 import function
 
@@ -22,24 +21,18 @@ class VideoFeed:
         ret_val, img = self.cam.read()
         if ret_val :
             img = function.resize(img)
-            cv2_im = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-            pil_im = Image.fromarray(cv2_im)
-            #创建一个转换为byte类型的方法
-            b = io.BytesIO()
-            # 将 pil_im中内容以'jpg'的格式使用b所表示方法（转换为byte类型)进行保存
-            pil_im.save(b, format='PNG')
-            im_bytes = b.getvalue()
-
-            return im_bytes
+            img_bytes2 = cv2.imencode('.png', img)[1].tostring()
+            img_bytes2 = base64.b64encode(img_bytes2)
+            return img_bytes2
         return None
-
-    def  set_frame(self, frame_bytes):
-        pil_bytes = io.BytesIO(frame_bytes)
-        pil_image = Image.open(pil_bytes)
-        cv_image = cv2.cvtColor(numpy.array(pil_image), cv2.COLOR_RGB2BGR)
+    def get_video(self):
+        pass
+    def set_frame(self, frame_bytes):
+        cv_image = function.cvRead(frame_bytes)
         cv2.imshow(self.name, cv_image)
         cv2.waitKey(1)
-
+    def get_video(self,video_bytes):
+        pass
 if __name__=="__main__":
     vf = VideoFeed("test",1)
     while 1:

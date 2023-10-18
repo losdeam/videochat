@@ -47,7 +47,7 @@ class Server:
                 # vsock.msgsent("服务器成功收到数据")
 
 if __name__ == "__main__":
-    ip = "127.0.0.1"
+    ip = "192.168.56.1"
     
     port = 6000
     server = Server(ip=ip,port=port )
