@@ -2,6 +2,7 @@ import socket, videosocket
 from videofeed import VideoFeed
 import threading
 import cv2 
+import function
 
 class Server:
     # 
@@ -27,17 +28,18 @@ class Server:
     def start(self,client_socket,address):
             #获取客户端所上传的视频流信息
             vsock = videosocket.videosocket(client_socket)
-
+            
             while True:
-
                 frame=vsock.vreceive()
-
+                frame = function.get_json(frame)
                 if frame :
-                    # print("成功接受到数据,类型为", type(frame))
+
+                    print("成功接受到数据,类型为", type(frame))
+                    # print(frame)
                     self.videofeed.set_frame(frame)
                 else:
                     print("客户端",address,"断开连接" )
-                    cv2.destroyWindow("server")
+                    # cv2.destroyWindow("server")
                     break 
 
                 # 获取视频数据，
@@ -48,7 +50,6 @@ class Server:
 
 if __name__ == "__main__":
     ip = "192.168.56.1"
-    
     port = 6000
     server = Server(ip=ip,port=port )
 
