@@ -27,10 +27,12 @@ def cvRead(img):
     return img2
 
 def combine(frame ,audio):
+    print(type(frame))
+    print(type(audio))
     msg = {
-        "frame" : str(frame),
-        "audio" : str(audio)
-    }
+        "frame" : frame,
+        "audio" : audio}
+    
     return json.dumps(msg)
 
 def get_json(msg_byte):

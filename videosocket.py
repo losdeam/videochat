@@ -16,7 +16,8 @@ class videosocket:
     # 实现连接
     def connect(self,host,port):
         self.sock.connect((host,port))
-
+    def send(self,byte):
+        self.sock.sendall(byte)
     # 实现输出
     def  vsend(self, framestring):
         '''
@@ -25,10 +26,11 @@ class videosocket:
         totalsent = 0
         metasent = 0
         length =len(framestring)
+        # print(length)
         # zfill 在字符串前补0 ，以满足需要
-        lengthstr=str(length).zfill(8)
+        lengthstr=str(length).zfill(10)
         # print(lengthstr)
-        while metasent < 8 :
+        while metasent < 10 :
             # sent 为成功发送的数量
             sent = self.sock.send(lengthstr[metasent:].encode())
             if sent == 0:
@@ -39,9 +41,13 @@ class videosocket:
         # print(framestring[totalsent:])
         while totalsent < length :
             sent = self.sock.send(framestring[totalsent:])
-            if sent == 0:
+            
+            if not sent:
                 raise RuntimeError("Socket connection broken")
             totalsent += sent
+            # print("已成功传输",totalsent,"剩余",length-totalsent)
+
+
     # 实现接收
     def vreceive(self):
         totrec=0
@@ -50,9 +56,9 @@ class videosocket:
         metaArray = []
         n = 0 
         count = 10
-        while metarec < 8:
+        while metarec < 10:
             #从嵌套字中接受数据，最大获取量为8 - metarec
-            chunk = self.sock.recv(8 - metarec)
+            chunk = self.sock.recv(10 - metarec)
             #当chunk == b''，即无接收值时表示接收失败
             if chunk == b'':
                 n  += 1 
@@ -67,17 +73,18 @@ class videosocket:
             
             metaArray.append(chunk.decode("utf-8"))
             metarec += len(chunk)
-
+        
         # print(metaArray)
         lengthstr= ''.join(metaArray)
         length=int(lengthstr)
-
+        # print(length)
         while totrec<length :
             chunk = self.sock.recv(length - totrec)
             if chunk == b'':
                 raise RuntimeError("Socket connection broken")
             msgArray+=chunk
             totrec += len(chunk)
+            # print("已成功接收",totrec,"剩余",length-totrec)
         return msgArray
    
 

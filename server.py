@@ -1,5 +1,6 @@
 import socket, videosocket
-from videofeed import VideoFeed
+from video_receive import Video_receive
+from video_sent import Video_sent
 import threading
 import cv2 
 import function
@@ -14,7 +15,7 @@ class Server:
         # socket中等待队列的最大数量
         self.server_socket.listen(5)
         # 创建名为server的视频流
-        self.videofeed = VideoFeed("server")
+        self.Video_receive = Video_receive("server")
         while True:
             print ("TCPServer Waiting for client on port 6000")
             # 持续等待客户端请求
@@ -29,25 +30,32 @@ class Server:
             #获取客户端所上传的视频流信息
             vsock = videosocket.videosocket(client_socket)
             
-            while True:
-                frame=vsock.vreceive()
-                frame = function.get_json(frame)
-                if frame :
+            while vsock:
+                try :
+                    video_thread = threading.Thread(target=self.receive_video(vsock))
+                    audio_thread = threading.Thread(target=self.receive_audio(vsock))
+                    audio_thread.start()
+                    video_thread.start()
+                    
+                except:
+                    print("客户端断开连接")
+                    self.Video_receive.colse()
+                    break
+                # print("成功接受到数据,类型为", type(frame))
 
-                    print("成功接受到数据,类型为", type(frame))
-                    # print(frame)
-                    self.videofeed.set_frame(frame)
-                else:
-                    print("客户端",address,"断开连接" )
-                    # cv2.destroyWindow("server")
-                    break 
 
                 # 获取视频数据，
                 # frame=self.videofeed.get_frame()
                 # 将视频数据方式发送给对应端口
                 # vsock.vsend(frame)
                 # vsock.msgsent("服务器成功收到数据")
+    def receive_audio(self,vsock):
+        audio = vsock.vreceive()
+        self.Video_receive.set_audio(audio)
 
+    def receive_video(self,vsock):
+        frame = vsock.vreceive()
+        self.Video_receive.set_frame(frame)
 if __name__ == "__main__":
     ip = "192.168.56.1"
     port = 6000

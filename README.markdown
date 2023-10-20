@@ -58,3 +58,6 @@ Distributed under GPL v2
 
 ![Alt text](结构文件_1.png)
           第一版结构
+
+2023.10.20
+经过测试，发现json在socket传输解码的过程中会导致混乱，使得解码错误。转而使用多线程进行操作。在后续实现web端时可以考虑使用json。
