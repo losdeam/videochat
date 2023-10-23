@@ -4,6 +4,8 @@ from video_sent import Video_sent
 import threading
 import cv2 
 import function
+import multiprocessing
+
 
 class Server:
     # 
@@ -16,6 +18,10 @@ class Server:
         self.server_socket.listen(5)
         # 创建名为server的视频流
         self.Video_receive = Video_receive("server")
+        #创建音频缓存区
+        self.audio_Queue = multiprocessing.Queue()
+        #创建图像缓存区
+        self.frame_Queue = multiprocessing.Queue()
         while True:
             print ("TCPServer Waiting for client on port 6000")
             # 持续等待客户端请求
@@ -29,7 +35,14 @@ class Server:
     def start(self,client_socket,address):
             #获取客户端所上传的视频流信息
             vsock = videosocket.videosocket(client_socket)
+            # 音频播放进程
+            audio_Process = multiprocessing.Process(target=function.receive_audio,args=(self.audio_Queue,))
+            # 视频播放进程
+            video_Process = multiprocessing.Process(target=function.receive_video,args=(self.frame_Queue,))
             
+            # 
+            audio_Process.start()
+            video_Process.start()
             while vsock:
                 try :
                     video_thread = threading.Thread(target=self.receive_video(vsock))
@@ -51,11 +64,11 @@ class Server:
                 # vsock.msgsent("服务器成功收到数据")
     def receive_audio(self,vsock):
         audio = vsock.vreceive()
-        self.Video_receive.set_audio(audio)
+        self.audio_Queue.put(audio)
 
     def receive_video(self,vsock):
         frame = vsock.vreceive()
-        self.Video_receive.set_frame(frame)
+        self.frame_Queue.put(frame)
 if __name__ == "__main__":
     ip = "192.168.56.1"
     port = 6000

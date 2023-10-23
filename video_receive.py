@@ -25,9 +25,9 @@ class   Video_receive:
         self.output_stream.write(audio_bytes)
 
     def colse(self):
-
+        if cv2.getWindowProperty(self.name, cv2.WND_PROP_VISIBLE) > 0:
         # 关闭窗口
-        cv2.destroyWindow(self.name)
+            cv2.destroyWindow(self.name)
         # 如果存在视频流，关闭它
         if self.output_stream:
             self.output_stream.stop_stream()

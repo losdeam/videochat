@@ -67,5 +67,6 @@ if __name__ == "__main__":
 
     print ("Connecting to " + ip_addr + "....")
     video = 'D:\\learn\\videochat\\videochat_self\\videochat\\1.mp4'
+    # video = 1
     client = Client(ip_addr)
     client.connect(video=video)

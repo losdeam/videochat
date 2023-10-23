@@ -2,6 +2,8 @@ import cv2
 import numpy as np
 import base64
 import json
+import pyaudio
+
 # 需要一个函数来对视频进行裁剪以压缩大小
 def resize(frame):
     return cv2.resize(frame,(320,320))
@@ -38,3 +40,28 @@ def combine(frame ,audio):
 def get_json(msg_byte):
     msg_str = msg_byte.decode()
     return  json.loads(msg_str)
+
+
+def receive_audio(audio_Queue):
+    print("audio_Queue",type(audio_Queue))
+    p = pyaudio.PyAudio()
+    stream = p.open(format=pyaudio.paInt16,
+        channels=2,
+        rate=44100,
+        output=True,
+        frames_per_buffer=1024)
+    while True :
+        audio= audio_Queue.get()
+        stream.write(audio)
+
+def receive_video(frame_queue,fps = 25 ):
+    print("frame_queue",type(frame_queue))
+    while True :
+        frame_data = frame_queue.get()
+        if not frame_data:
+            continue 
+        cv_image = cvRead(frame_data)
+        
+        cv2.imshow("test", cv_image)
+        cv2.waitKey(1000//25)
+
