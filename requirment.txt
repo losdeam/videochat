@@ -1,0 +1,12 @@
+#pip install -r requirment.txt
+# ------- video--------
+ffmpeg-python
+opencv-python
+pyaudio
+
+# ------- web ----------
+flask
+
+
+# ------- sent --------
+socket 
