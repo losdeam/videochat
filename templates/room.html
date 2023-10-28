@@ -1,0 +1,71 @@
+<html>
+<head>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.0/socket.io.js" ></script>
+<script>
+// 连接Socket.IO
+const socket = io();
+const room_id = {{room_id}}
+// 获取DOM元素
+
+const messageContainer = document.getElementById('message-container');
+const sendBtn = document.getElementById('send');
+// 确保DOM加载完成  
+if(sendBtn) {
+	// 添加点击监听
+	sendBtn.addEventListener('click', () => {
+		let user_name = document.getElementById('user_name').value;
+		let message   = document.getElementById('message').value;
+		// 1.2 发送数据到socket服务器
+		socket.emit('chat_send', {
+			room_id : room_id  ,
+			username : user_name,
+			message : message
+		});
+	});
+} 
+else {
+	// DOM还没加载完成
+	document.addEventListener('DOMContentLoaded', () => {  
+		const sendBtn = document.getElementById('send');
+		// 添加点击监听
+		sendBtn.addEventListener('click', () => {
+			let user_name = document.getElementById('user_name').value;
+			let message   = document.getElementById('message').value;
+			// 1.2 发送数据到socket服务器
+			socket.emit('chat_send', {
+				room_id : room_id  ,
+				username : user_name,
+				message : message
+			});
+		});
+	});
+}
+if (messageContainer){
+	// 在DOM加载后获取元素 
+	socket.on('chat_recv_{{ room_id }}', (data) => {
+		messageContainer.innerHTML +=`<p>${data.username}</p>`;
+		messageContainer.innerHTML +=`<p>${data.message}</p>`;
+		});
+	}
+else{
+	document.addEventListener('DOMContentLoaded', () => {
+		const messageContainer = document.getElementById('message-container');
+		socket.on('chat_recv_{{ room_id }}', (data) => {
+			messageContainer.innerHTML +=`<h5>${data.username}</h5>`;
+			messageContainer.innerHTML += `<p>${data.message}</p>`;
+		});
+	});
+}
+
+  </script>
+</head>
+<body>
+<!-- 消息区域 -->
+<div id="message-container">text</div> 
+
+<!-- 输入消息 -->
+<input id="user_name" type="text" placeholder="请输入用户名">
+<input id="message" type="text" placeholder="请输入消息">
+<button id="send">Send</button>
+</body>
+</html>

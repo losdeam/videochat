@@ -1,0 +1,29 @@
+<html>
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.0/socket.io.js" ></script>
+<script>
+   const socket = io(); //需要注意的是 socket仅绑定当前页面
+ 
+    socket.on('connect', function() { 
+        console.log('连接已建立');
+        socket.emit('test');  // 在连接成功后发送消息
+    });
+    
+    socket.on('read', function(data) {
+        console.log('读取成功');  // 收到服务端发送的数据
+        console.log(data);  // 收到服务端发送的数据
+    });
+
+    socket.on('play', function(data) {
+        console.log('读取成功');  // 收到服务端发送的数据
+    });
+    socket.on('sent_finish', function() {
+        console.log('载入完毕');  // 收到服务端发送的数据
+
+    });
+  </script>
+</head>
+<body>
+  <h1>传输进行中</h1>
+</body>
+</html>
