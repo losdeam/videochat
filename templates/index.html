@@ -3,25 +3,35 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.0/socket.io.js" ></script>
 <script src="../static/js/videoloader.js"></script>
 <script>
+
 // 连接Socket.IO
 const socket = io();
 
 // 获取DOM元素
 const messageContainer = document.getElementById('message-container');
 const joinRoomBtn = document.getElementById('join-room');
+
 socket.on('join', function(data) { 
 	window.location.href = '/room/' + data.roomId;
     });
+
 socket.on('read', function(data) {
 	console.log('读取成功');  // 收到服务端发送的数据
 	console.log(data);  // 收到服务端发送的数据
 });
+
+
+socket.on('connect', function() { 
+        console.log('连接已建立');
+    });
 // 确保DOM加载完成  
 if(joinRoomBtn) {
 	// 添加点击监听
 	joinRoomBtn.addEventListener('click', () => {
 		let roomId = document.getElementById('room-id').value;
+		let username = document.getElementById('user_name').value;
 		socket.emit('join', {
+			name : username,
 			room: roomId
 		});
 	});
@@ -32,7 +42,9 @@ else {
 		const joinRoomBtn = document.getElementById('join-room');
 		joinRoomBtn.addEventListener('click', () => {
 			let roomId = document.getElementById('room-id').value;
+			let username = document.getElementById('user_name').value;
 			socket.emit('join', {
+				name : username,
 				room: roomId
 			}); 
 		});
@@ -59,15 +71,14 @@ else{
 </head>
 <body>
 <!-- 房间输入框 -->
-<input id="room-id" type="text" placeholder="Enter room id">
+<input id="room-id" type="text" placeholder="请输入房间号">
+<!-- 用户名输入框 -->
+<input id="user_name" type="text" placeholder="请输入用户名">
+
 <button id="join-room">Join Room</button>
 
-<!-- 消息区域 -->
-<div id="message-container">text</div> 
-
-<!-- 输入消息 -->
-<input id="message" type="text">
 <button id="send">Send</button>
+
 
 <input type="file" id="videoFile" accept="video/*">
 <button id="uploadBtn">Upload</button> 

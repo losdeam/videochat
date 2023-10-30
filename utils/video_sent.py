@@ -8,14 +8,16 @@ import utils.function as function
 
 class Video_sent:
 
-    def __init__(self,load):
-
-        # 以迭代器的形式获取video中的视频数据
-        self.video = load.video.iter_frames()
-        # 打开soumd.wav文件
-        self.wf = wave.open(load.name + '.wav', 'rb')
-        # 获取音频长度（以byte为单位）
-        self.len = self.wf.getnframes()
+    def __init__(self,load,flag):
+        if flag :
+            # 以迭代器的形式获取video中的视频数据
+            self.video = load.video.iter_frames()
+            # 打开soumd.wav文件
+            self.wf = wave.open(load.name + '.wav', 'rb')
+            # 获取音频长度（以byte为单位）
+            self.len = self.wf.getnframes()
+        else:
+            self.
         # self.len_frame = 0 
     #图像转base64
     def get_frame(self):

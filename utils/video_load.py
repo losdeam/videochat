@@ -3,31 +3,23 @@ import utils.function as function
 import ffmpeg
 from moviepy.editor import VideoFileClip
 from io import BytesIO
-
+import pyaudio
 
 class Video_load:
 
-    def __init__(self,name="w1",video=0,flag = 0 ):
+    def __init__(self,name="w1",video=0):
         # 初始化
         self.name = name
-        if flag == 0 :
-            in_mem_file = BytesIO(video)
-            video = ffmpeg.input(in_mem_file)
-            audio = video.audio
-            print(type(video),type(audio))
-            self.out_frame_file = BytesIO()
-            self.out_audio_file = BytesIO()
-            video.output(self.out_frame_file).run()
-            audio.output(self.out_audio_file).run()
-            
-            self.out_audio_file = self.out_frame_file.seek(0)
-            self.out_audio_file = self.out_audio_file.getvalue()
-            print(type(self.out_frame_file))
-            print(type(self.out_audio_file))
+        # 客户端上传视频（未完成）
 
-        elif flag ==1 :
-            pass # 摄像头
+        if  video  :
+            self.inout_ = audio.open(format=pyaudio.paInt16,  # 指定数据类型是int16，也就是一个数据点占2个字节；paInt16=8，paInt32=2，不明其含义，先不管
+                        channels=2,  # 声道数，1或2
+                        rate=44100,  # 采样率，44100或16000居多
+                        frames_per_buffer=1024,  # 每个块包含多少帧，详见下文解释
+                        output=True)  # 表示这是一个输出流，要对外播放的
         else :
+            # 本地上传视频
             self.video = VideoFileClip(video)  
             # 获取音频时长以确定视频的总时长
             self.video_time = self.video.duration

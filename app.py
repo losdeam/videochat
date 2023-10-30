@@ -1,6 +1,4 @@
-
-
-from flask import Flask, render_template,request
+from flask import Flask, render_template,request,make_response, redirect
 from flask_socketio import SocketIO,join_room, leave_room
 # from utils.function import call
 from utils.video_load import Video_load
@@ -8,46 +6,48 @@ from utils.video_sent import Video_sent
 import time 
 import json 
 
+connected_users = {}
+user_to_sid = {}
 
 app=Flask(__name__)
 socketio = SocketIO(app)
+
 ####### 连接部分 #########
 @socketio.on('connect') 
 # 当连接完毕
 def connect():
     global connected
     connected = True 
-    print('已成功连接')
 
 # 当连接断开
 @socketio.on('disconnect') 
 def disconnect ():
     global connected
-    connected = False 
+    connected = False
+
 
 ####### 聊天室部分
 # 加入房间
 @socketio.on('join')
 def on_join(data):
-    room = data['room']
-    join_room(room)
-    print(data)
-    print(room)
-    socketio.emit("join",{"roomId":str(room),"content":"加入房间"})  
+    response = make_response(redirect('/'))
+    response.set_cookie('username', data["name"])
+    join_room(data['room'])
+    socketio.emit("join",{"roomId":data['room'],"content":"加入房间"},room=request.sid)  
+
 
 # 离开房间
-@socketio.on('leave')
+@socketio.on('leaveRoom')
 def on_leave(data):
     room = data['room']
     leave_room(room)
-    socketio.emit("newMessage",{"content":"离开房间"})  
+    print(request.cookies.get('username')+"离开了房间")
 
-    room = data['room']
-    socketio.emit("newMessage",{"content":data['content']})  
 # 发送信息
 @socketio.on('chat_send')
 def chat_send(data):
-    print(data)
+    if data["flag"]:
+        data["message"] = request.cookies.get('username')  + data["message"]
     socketio.emit("chat_recv_"+str(data['room_id']),data)  
 
 @app.route('/room/<room_id>') 
@@ -108,8 +108,9 @@ def index():
     return render_template('index.html')
 
 
-
-
+@app.route('/test')
+def test_():
+    return render_template('test.html')
 # 接口
 @app.route('/emit', methods=['POST']) 
 def emit_event():
@@ -157,6 +158,44 @@ def upload_video():
     print("视频读取完毕")
     # 保存视频文件
     return {'status': 'success'}
+
+# 加入房间（接受房间的信号）
+@app.route('/join_post', methods=['POST'])
+def join_post(data):
+    room = data['room']
+    join_room(room)
+    socketio.emit("join",{"roomId":str(room),"content":"加入房间"})  
+
+
+# 
+# 开启直播（接受房间的信号）
+@app.route('/broadcast', methods=['POST'])
+def broadcast(data):
+    flag = 1 
+    Video_loads = Video_load("client",0)
+    print("开始发送")
+    video = Video_sent(Video_loads)
+    #持续从视频流中获取帧信息
+    n = 0
+    # 当连接时，持续发送
+    while connected:
+        # print("传输进行中",n)
+        # 通过Video_sent来获取本机的视频流数据
+        frame=video.get_frame()
+        audio,n= video.get_audio(n)
+        # print(type(frame),type(audio))
+        if not (frame or   audio):
+            break
+        datas =  {
+            'time' : time.time(),
+            'frame' : frame,
+            'audio' : str(audio)
+        }
+        datas = json.dumps(datas)
+        socketio.emit('play',datas)  
+    print("发送完毕")
+    socketio.emit('sent_finish')  
+
 if __name__=="__main__":
     app.run(debug=True, host = "0.0.0.0",port=50000)
     socketio.run(app)

@@ -6,9 +6,15 @@
 const socket = io();
 const room_id = {{room_id}}
 // 获取DOM元素
+window.addEventListener('beforeunload', leaveRoom);
+function leaveRoom() {
+  socket.emit('leaveRoom');
+}
+
 
 const messageContainer = document.getElementById('message-container');
 const sendBtn = document.getElementById('send');
+const broadcastBtn = document.getElementById('broadcast');
 // 确保DOM加载完成  
 if(sendBtn) {
 	// 添加点击监听
@@ -38,6 +44,12 @@ else {
 				message : message
 			});
 		});
+		socket.on('connect', () => {
+			socket.emit('chat_send', {
+				room_id : room_id  ,
+				message : "加入房间"
+			});
+		});
 	});
 }
 if (messageContainer){
@@ -56,8 +68,22 @@ else{
 		});
 	});
 }
+if (broadcastBtn){
+	// 在DOM加载后获取元素 
+	socket.emit('broadcast', {
+				room_id : room_id  ,
+				message : "加入房间"
+			});
+	}
+else{
+	document.addEventListener('DOMContentLoaded', () => {
+		const broadcastBtn = document.getElementById('broadcast');
 
-  </script>
+	});
+}
+
+</script>
+
 </head>
 <body>
 <!-- 消息区域 -->
@@ -67,5 +93,8 @@ else{
 <input id="user_name" type="text" placeholder="请输入用户名">
 <input id="message" type="text" placeholder="请输入消息">
 <button id="send">Send</button>
+
+<button id="broadcast">以post的形式发送获取视频流请求</button>
+
 </body>
 </html>
